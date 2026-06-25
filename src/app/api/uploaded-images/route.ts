@@ -4,7 +4,7 @@ import path from 'path';
 import { getDb } from '@/lib/db';
 import crypto from 'crypto';
 
-const ASSETS_DIR = path.join(process.cwd(), 'public', 'uploads');
+const ASSETS_DIR = '/var/www/videos/assets/uploaded';
 const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
 
