@@ -2,8 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import ImageUpload from '@/components/ImageUpload';
-import { Camera, Upload, X, ArrowLeft, Trash2, Image as ImageIcon } from 'lucide-react';
-import Link from 'next/link';
+import { Camera, Upload, X, Trash2, Image as ImageIcon } from 'lucide-react';
 
 interface UploadedImage {
   id: string;
@@ -20,9 +19,14 @@ interface UploadedImage {
 export default function UploadedImagesPage() {
   const [images, setImages] = useState<UploadedImage[]>([]);
   const [uploading, setUploading] = useState(false);
-  const [uploadResult, setUploadResult] = useState<{ success: boolean; url?: string } | null>(null);
+  const [uploadResult, setUploadResult] = useState<{
+    success: boolean;
+    url?: string;
+  } | null>(null);
   const [filterCategory, setFilterCategory] = useState<string>('all');
-  const [previewImage, setPreviewImage] = useState<UploadedImage | null>(null);
+  const [previewImage, setPreviewImage] = useState<UploadedImage | null>(
+    null
+  );
 
   // Load images from DB
   useEffect(() => {
@@ -40,44 +44,52 @@ export default function UploadedImagesPage() {
     loadImages();
   }, []);
 
-  const handleUpload = useCallback(async (file: File, dataUrl: string) => {
-    setUploading(true);
-    setUploadResult(null);
+  const handleUpload = useCallback(
+    async (file: File, dataUrl: string) => {
+      setUploading(true);
+      setUploadResult(null);
 
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('category', filterCategory === 'all' ? 'general' : filterCategory);
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append(
+        'category',
+        filterCategory === 'all' ? 'general' : filterCategory
+      );
 
-    try {
-      const res = await fetch('/api/uploaded-images', {
-        method: 'POST',
-        body: formData,
-      });
-      const result = await res.json();
-      if (result.success) {
-        setUploadResult({ success: true, url: result.url });
-        // Reload images list
-        const res2 = await fetch('/api/uploaded-images');
-        if (res2.ok) {
-          const data = await res2.json();
-          setImages(data);
+      try {
+        const res = await fetch('/api/uploaded-images', {
+          method: 'POST',
+          body: formData,
+        });
+        const result = await res.json();
+        if (result.success) {
+          setUploadResult({ success: true, url: result.url });
+          // Reload images list
+          const res2 = await fetch('/api/uploaded-images');
+          if (res2.ok) {
+            const data = await res2.json();
+            setImages(data);
+          }
+        } else {
+          setUploadResult({ success: false });
         }
-      } else {
+      } catch (e) {
         setUploadResult({ success: false });
+      } finally {
+        setUploading(false);
       }
-    } catch (e) {
-      setUploadResult({ success: false });
-    } finally {
-      setUploading(false);
-    }
-  }, [filterCategory]);
+    },
+    [filterCategory]
+  );
 
   const handleDelete = async (id: string) => {
     if (!confirm('确定要删除这张图片吗？')) return;
     try {
-      const res = await fetch(`/api/uploaded-images?id=${id}`, { method: 'DELETE' });
+      const res = await fetch(`/api/uploaded-images?id=${id}`, {
+        method: 'DELETE',
+      });
       if (res.ok) {
-        setImages(prev => prev.filter(img => img.id !== id));
+        setImages((prev) => prev.filter((img) => img.id !== id));
         if (previewImage?.id === id) setPreviewImage(null);
       }
     } catch (e) {
@@ -85,8 +97,14 @@ export default function UploadedImagesPage() {
     }
   };
 
-  const categories = ['all', ...Array.from(new Set(images.map(i => i.category)))];
-  const filteredImages = filterCategory === 'all' ? images : images.filter(i => i.category === filterCategory);
+  const categories = [
+    'all',
+    ...Array.from(new Set(images.map((i) => i.category))),
+  ];
+  const filteredImages =
+    filterCategory === 'all'
+      ? images
+      : images.filter((i) => i.category === filterCategory);
 
   const formatSize = (bytes: number) => {
     if (bytes < 1024) return bytes + ' B';
@@ -95,24 +113,17 @@ export default function UploadedImagesPage() {
   };
 
   return (
-    <div className="space-y-6">
-      {/* 返回导航 */}
-      <Link
-        href="/"
-        className="inline-flex items-center gap-1.5 text-sm text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 transition-colors"
-      >
-        <ArrowLeft className="w-3.5 h-3.5" />
-        返回工作台
-      </Link>
-
+    <div className="max-w-5xl mx-auto p-8 space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">图片库</h1>
-        <span className="text-sm text-zinc-400">共 {images.length} 张图片</span>
+        <span className="text-sm text-zinc-400">
+          共 {images.length} 张图片
+        </span>
       </div>
 
       {/* 分类筛选 */}
       <div className="flex gap-2 flex-wrap">
-        {categories.map(cat => (
+        {categories.map((cat) => (
           <button
             key={cat}
             onClick={() => setFilterCategory(cat)}
@@ -122,7 +133,11 @@ export default function UploadedImagesPage() {
                 : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-500 hover:bg-zinc-200 dark:hover:bg-zinc-700'
             }`}
           >
-            {cat === 'all' ? '全部' : cat} ({cat === 'all' ? images.length : images.filter(i => i.category === cat).length})
+            {cat === 'all' ? '全部' : cat} (
+            {cat === 'all'
+              ? images.length
+              : images.filter((i) => i.category === cat).length}
+            )
           </button>
         ))}
       </div>
@@ -141,16 +156,20 @@ export default function UploadedImagesPage() {
           />
           <div className="space-y-3">
             <p className="text-xs text-zinc-400">
-              支持格式: JPEG, PNG, WebP, GIF<br/>
-              最大文件大小: 50MB<br/>
+              支持格式: JPEG, PNG, WebP, GIF
+              <br />
+              最大文件大小: 50MB
+              <br />
               上传后自动保存到数据库
             </p>
             {uploadResult && (
-              <div className={`p-3 rounded-lg text-sm ${
-                uploadResult.success
-                  ? 'bg-green-50 dark:bg-green-950/30 text-green-700 dark:text-green-400'
-                  : 'bg-red-50 dark:bg-red-950/30 text-red-700 dark:text-red-400'
-              }`}>
+              <div
+                className={`p-3 rounded-lg text-sm ${
+                  uploadResult.success
+                    ? 'bg-green-50 dark:bg-green-950/30 text-green-700 dark:text-green-400'
+                    : 'bg-red-50 dark:bg-red-950/30 text-red-700 dark:text-red-400'
+                }`}
+              >
                 {uploadResult.success
                   ? `上传成功! URL: ${uploadResult.url}`
                   : '上传失败，请重试'}
@@ -182,7 +201,10 @@ export default function UploadedImagesPage() {
                 />
                 {/* 删除按钮 */}
                 <button
-                  onClick={(e) => { e.stopPropagation(); handleDelete(img.id); }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDelete(img.id);
+                  }}
                   className="absolute top-2 right-2 p-1.5 bg-red-600/80 hover:bg-red-600 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
@@ -193,8 +215,15 @@ export default function UploadedImagesPage() {
                 </span>
               </div>
               <div className="p-2">
-                <p className="text-xs font-medium truncate" title={img.filename}>{img.filename}</p>
-                <p className="text-xs text-zinc-400">{formatSize(img.file_size)}</p>
+                <p
+                  className="text-xs font-medium truncate"
+                  title={img.filename}
+                >
+                  {img.filename}
+                </p>
+                <p className="text-xs text-zinc-400">
+                  {formatSize(img.file_size)}
+                </p>
               </div>
             </div>
           ))}
@@ -213,7 +242,9 @@ export default function UploadedImagesPage() {
           >
             <div className="p-6">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-bold">{previewImage.filename}</h3>
+                <h3 className="text-lg font-bold">
+                  {previewImage.filename}
+                </h3>
                 <button
                   onClick={() => setPreviewImage(null)}
                   className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200"

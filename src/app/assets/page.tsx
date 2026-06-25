@@ -1,8 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { FolderOpen, Camera, Film, ArrowLeft } from 'lucide-react';
-import Link from 'next/link';
+import { FolderOpen, Camera, Film } from 'lucide-react';
 
 interface CharImage {
   name: string;
@@ -19,7 +18,9 @@ interface VideoFile {
 }
 
 export default function AssetsPage() {
-  const [activeSection, setActiveSection] = useState<'character-images' | 'videos'>('character-images');
+  const [activeSection, setActiveSection] = useState<
+    'character-images' | 'videos'
+  >('character-images');
   const [charImages, setCharImages] = useState<CharImage[]>([]);
   const [videoFiles, setVideoFiles] = useState<VideoFile[]>([]);
   const [charFilter, setCharFilter] = useState<string>('all');
@@ -43,7 +44,8 @@ export default function AssetsPage() {
             }
             if (char.images?.clothed) {
               images.push({
-                name: char.images.clothed.split('/').pop() || 'clothed.png',
+                name:
+                  char.images.clothed.split('/').pop() || 'clothed.png',
                 path: char.images.clothed,
                 character: char.name,
                 type: 'clothed',
@@ -85,20 +87,14 @@ export default function AssetsPage() {
     loadVideos();
   }, []);
 
-  const filteredImages = charFilter === 'all' ? charImages : charImages.filter(i => i.character === charFilter);
-  const characters = [...new Set(charImages.map(i => i.character))];
+  const filteredImages =
+    charFilter === 'all'
+      ? charImages
+      : charImages.filter((i) => i.character === charFilter);
+  const characters = [...new Set(charImages.map((i) => i.character))];
 
   return (
-    <div className="space-y-6">
-      {/* 返回导航 */}
-      <Link
-        href="/"
-        className="inline-flex items-center gap-1.5 text-sm text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 transition-colors"
-      >
-        <ArrowLeft className="w-3.5 h-3.5" />
-        返回工作台
-      </Link>
-
+    <div className="max-w-5xl mx-auto p-8 space-y-6">
       {/* 顶部标签 */}
       <div className="flex gap-2 border-b border-zinc-200 dark:border-zinc-800 pb-4">
         <button
@@ -123,7 +119,9 @@ export default function AssetsPage() {
         >
           <Film className="w-4 h-4" />
           视频文件
-          <span className="text-xs opacity-60">({videoFiles.length})</span>
+          <span className="text-xs opacity-60">
+            ({videoFiles.length})
+          </span>
         </button>
       </div>
 
@@ -142,7 +140,7 @@ export default function AssetsPage() {
             >
               全部 ({charImages.length})
             </button>
-            {characters.map(char => (
+            {characters.map((char) => (
               <button
                 key={char}
                 onClick={() => setCharFilter(char)}
@@ -176,8 +174,10 @@ export default function AssetsPage() {
                       className="w-full h-full object-cover"
                       onError={(e) => {
                         (e.target as HTMLImageElement).src = '';
-                        (e.target as HTMLImageElement).className = 'w-full h-full flex items-center justify-center text-zinc-300';
-                        (e.target as HTMLImageElement).innerHTML = '<Camera class="w-8 h-8" />';
+                        (e.target as HTMLImageElement).className =
+                          'w-full h-full flex items-center justify-center text-zinc-300';
+                        (e.target as HTMLImageElement).innerHTML =
+                          '<Camera class="w-8 h-8" />';
                       }}
                     />
                     <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors" />
@@ -186,8 +186,12 @@ export default function AssetsPage() {
                     </span>
                   </div>
                   <div className="p-2">
-                    <p className="text-xs font-medium truncate">{img.character}</p>
-                    <p className="text-xs text-zinc-400 truncate">{img.name}</p>
+                    <p className="text-xs font-medium truncate">
+                      {img.character}
+                    </p>
+                    <p className="text-xs text-zinc-400 truncate">
+                      {img.name}
+                    </p>
                   </div>
                 </div>
               ))}
@@ -220,8 +224,12 @@ export default function AssetsPage() {
                     />
                   </div>
                   <div className="p-3">
-                    <p className="text-xs font-medium truncate">{vid.name}</p>
-                    <p className="text-xs text-zinc-400 truncate">{vid.project}</p>
+                    <p className="text-xs font-medium truncate">
+                      {vid.name}
+                    </p>
+                    <p className="text-xs text-zinc-400 truncate">
+                      {vid.project}
+                    </p>
                   </div>
                 </div>
               ))}
