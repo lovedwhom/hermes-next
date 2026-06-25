@@ -5,7 +5,6 @@ import { getDb } from '@/lib/db';
 import crypto from 'crypto';
 
 const ASSETS_DIR = path.join(process.cwd(), 'public', 'uploads');
->>>>>>> 21859f3 (fix: 修复上传图片后无法预览的问题)
 const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
 
